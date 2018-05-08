@@ -104,7 +104,12 @@ module FilterTable
       if block_given?
         table = table.find_all { |e| new_entry(e, '').instance_eval(&block) }
         src = Trace.new
-        src.instance_eval(&block)
+        # Swallow any exceptions raised here.
+        # See https://github.com/chef/inspec/issues/2929
+        begin
+          src.instance_eval(&block)
+        rescue
+        end
         filters += Trace.to_ruby(src)
       end
 
